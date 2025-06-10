@@ -31,16 +31,43 @@ namespace Instancer.Server.Services.Orchestrators
             };
 
             var proc = Process.Start(psi);
-            await proc.WaitForExitAsync();
+            if (proc != null)
+            {
+                await proc.WaitForExitAsync();
+            }
 
             return $"http://localhost:{variables["PORT"]}";
         }
 
 
-        public Task<bool> DeleteStack(Guid instanceId)
+        public async Task<bool> DeleteStack(Guid instanceId)
         {
-            // TODO: remove docker stack
-            return Task.FromResult(true);
+            var composeFile = Path.Combine("generated", $"stack-{instanceId}.yml");
+            if (!File.Exists(composeFile))
+            {
+                return false;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = "docker-compose",
+                Arguments = $"-f {composeFile} down",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            var proc = Process.Start(psi);
+            if (proc != null)
+            {
+                await proc.WaitForExitAsync();
+                if (proc.ExitCode == 0)
+                {
+                    File.Delete(composeFile);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private string RenderTemplate(string templatePath, Dictionary<string, string> variables, string instanceId)
