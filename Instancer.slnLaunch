@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Dev",
+    "Projects": [
+      {
+        "Path": "Instancer.Server\\Instancer.Server.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Instancer.Daemon\\Instancer.Daemon.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
