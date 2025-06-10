@@ -4,15 +4,18 @@
     "Projects": [
       {
         "Path": "Instancer.Server\\Instancer.Server.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "Container (Dockerfile)"
       },
       {
         "Path": "Instancer.Daemon\\Instancer.Daemon.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "Instancer.Daemon"
       },
       {
         "Path": "Instancer.Cli\\Instancer.Cli.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "Instancer.Cli"
       }
     ]
   }

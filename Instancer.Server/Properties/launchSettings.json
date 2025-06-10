@@ -4,11 +4,12 @@
       "commandName": "Docker",
       "launchBrowser": false,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "leaveRunningOnClose": false,
+      "leaveRunningOnClose": true,
       "environmentVariables": {
         "ASPNETCORE_HTTP_PORTS": "8080"
       },
-      "publishAllPorts": true,
+      "publishAllPorts": true, 
+      "httpPort": 8080,
       "useSSL": false
     }
   },

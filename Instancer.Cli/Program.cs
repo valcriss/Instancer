@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 public class Program
 {
     private const string StackRequestUri = "/api/stack";
-    internal static Func<HttpClient> CreateServerClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:32790") };
+    internal static Func<HttpClient> CreateServerClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:8080") };
     internal static Func<HttpClient> CreateDaemonClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:5151") };
 
     public static Task<int> Main(string[] args)
