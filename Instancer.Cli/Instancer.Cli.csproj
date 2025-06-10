@@ -13,4 +13,10 @@
     <PackageReference Include="YamlDotNet" Version="15.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="docker-compose.test.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

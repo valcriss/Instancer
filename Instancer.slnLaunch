@@ -9,6 +9,10 @@
       {
         "Path": "Instancer.Daemon\\Instancer.Daemon.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "Instancer.Cli\\Instancer.Cli.csproj",
+        "Action": "Start"
       }
     ]
   }

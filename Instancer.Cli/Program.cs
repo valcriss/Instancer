@@ -6,7 +6,8 @@ using System.Text.RegularExpressions;
 
 public class Program
 {
-    internal static Func<HttpClient> CreateServerClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
+    private const string StackRequestUri = "/api/stack";
+    internal static Func<HttpClient> CreateServerClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:32790") };
     internal static Func<HttpClient> CreateDaemonClient = () => new HttpClient { BaseAddress = new Uri("http://localhost:5151") };
 
     public static Task<int> Main(string[] args)
@@ -92,11 +93,19 @@ public class Program
             }
         }
 
-        var client = CreateServerClient();
-        var resp = await client.PostAsJsonAsync("/api/stacks", new { Name = name, Compose = compose });
-        resp.EnsureSuccessStatusCode();
-        var text = await resp.Content.ReadAsStringAsync();
-        Console.WriteLine(text);
+        try
+        {
+            var client = CreateServerClient();
+            var resp = await client.PostAsJsonAsync(StackRequestUri, new { Name = name, Compose = compose });
+            resp.EnsureSuccessStatusCode();
+            var text = await resp.Content.ReadAsStringAsync();
+            Console.WriteLine(text);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending compose file: {ex.Message}");
+            return;
+        }
     }
 
     private record StackInfo(Guid Id, string Name);
@@ -105,7 +114,7 @@ public class Program
     {
         var stackName = new DirectoryInfo(Directory.GetCurrentDirectory()).Name;
         var client = CreateServerClient();
-        var listResp = await client.GetAsync("/api/stacks");
+        var listResp = await client.GetAsync(StackRequestUri);
         listResp.EnsureSuccessStatusCode();
         var body = await listResp.Content.ReadAsStringAsync();
         var stacks = System.Text.Json.JsonSerializer.Deserialize<List<StackInfo>>(body, new System.Text.Json.JsonSerializerOptions
@@ -129,7 +138,7 @@ public class Program
     internal static async Task Status()
     {
         var client = CreateServerClient();
-        var resp = await client.GetAsync("/api/stacks");
+        var resp = await client.GetAsync(StackRequestUri);
         resp.EnsureSuccessStatusCode();
         var text = await resp.Content.ReadAsStringAsync();
         Console.WriteLine(text);
