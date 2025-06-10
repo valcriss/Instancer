@@ -1,0 +1,6 @@
+@Instancer.Server_HostAddress = http://localhost:5074
+
+GET {{Instancer.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
