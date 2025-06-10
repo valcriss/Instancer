@@ -29,6 +29,6 @@
 ## Testing Avant chaque commit
 
 - il faut vérifier qu'il n'y ai pas de warning ou d'erreur dans le build + intellisence 
-- Lancer les tests unitaires et s'assurer que la couverture de code est a 100% sur chaque critère de test (lignes, branches, fonctions)
+- Lancer les tests unitaires et s'assurer de maximiser au maximum la couverture de code sur chaque critère de test (lignes, branches, fonctions)
 - Vérifier que le build passe bien
 - Si un Dockerfile est présent a la racine, vérifier que le build de l'image fonctionne correctement
