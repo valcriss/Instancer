@@ -23,7 +23,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddSingleton<IOrchestrator, DockerOrchestrator>();
 builder.Services.AddScoped<StackService>();
-builder.Services.AddSingleton<TemplateService>();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
