@@ -20,16 +20,14 @@ public class Program
         var root = new RootCommand("Instancer CLI");
 
         var up = new Command("up", "Deploy a stack");
-        var nameOpt = new Option<string>("--name") { IsRequired = true };
-        var fileOpt = new Option<string>("--file") { IsRequired = true };
-        up.AddOption(nameOpt);
+        var fileOpt = new Option<string>(new[] { "--file", "-f" }, () => "docker-compose.yml", "Compose file path");
+        var nameOpt = new Option<string?>(new[] { "--name", "-n" }, description: "Override stack name");
         up.AddOption(fileOpt);
-        up.SetHandler(async (string name, string file) => await Up(name, file), nameOpt, fileOpt);
+        up.AddOption(nameOpt);
+        up.SetHandler(async (string file, string? name) => await Up(file, name), fileOpt, nameOpt);
 
         var down = new Command("down", "Delete a stack");
-        var idOpt = new Option<Guid>("--id") { IsRequired = true };
-        down.AddOption(idOpt);
-        down.SetHandler(async (Guid id) => await Down(id), idOpt);
+        down.SetHandler(async () => await Down());
 
         var status = new Command("status", "List stacks");
         status.SetHandler(async () => await Status());
@@ -70,8 +68,20 @@ public class Program
         }
     }
 
-    internal static async Task Up(string name, string file)
+    internal static async Task Up(string file, string? name)
     {
+        if (!File.Exists(file))
+        {
+            Console.WriteLine($"Compose file '{file}' not found");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            var dir = Path.GetDirectoryName(Path.GetFullPath(file));
+            name = new DirectoryInfo(dir!).Name;
+        }
+
         var compose = File.ReadAllText(file);
         foreach (var port in GetHostPorts(compose))
         {
@@ -89,10 +99,27 @@ public class Program
         Console.WriteLine(text);
     }
 
-    internal static async Task Down(Guid id)
+    private record StackInfo(Guid Id, string Name);
+
+    internal static async Task Down()
     {
+        var stackName = new DirectoryInfo(Directory.GetCurrentDirectory()).Name;
         var client = CreateServerClient();
-        var resp = await client.DeleteAsync($"/api/stacks/{id}");
+        var listResp = await client.GetAsync("/api/stacks");
+        listResp.EnsureSuccessStatusCode();
+        var body = await listResp.Content.ReadAsStringAsync();
+        var stacks = System.Text.Json.JsonSerializer.Deserialize<List<StackInfo>>(body, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        var stack = stacks?.FirstOrDefault(s => s.Name == stackName);
+        if (stack == null)
+        {
+            Console.WriteLine("Stack not found");
+            return;
+        }
+
+        var resp = await client.DeleteAsync($"/api/stacks/{stack.Id}");
         if (resp.IsSuccessStatusCode)
             Console.WriteLine("Stack removed");
         else
