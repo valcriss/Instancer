@@ -8,18 +8,9 @@ namespace Instancer.Server.Services.Orchestrators
 {
     public class DockerOrchestrator : IOrchestrator
     {
-        public async Task<string> DeployStack(StackInstance instance)
+        public async Task<string> DeployStack(StackInstance instance, string compose)
         {
-            var templateDir = Path.Combine("templates", instance.Template);
-            var templateFile = Path.Combine(templateDir, "docker-compose.template.yml");
-
-            var variables = new Dictionary<string, string>
-            {
-                ["PORT"] = GetAvailablePort().ToString(),
-                ["APP_ENV"] = "development"
-            };
-
-            var composedFile = RenderTemplate(templateFile, variables, instance.Id.ToString());
+            var composedFile = SaveCompose(compose, instance.Id.ToString());
 
             // Appel docker-compose
             var psi = new ProcessStartInfo
@@ -36,7 +27,7 @@ namespace Instancer.Server.Services.Orchestrators
                 await proc.WaitForExitAsync();
             }
 
-            return $"http://localhost:{variables["PORT"]}";
+            return $"http://localhost:{instance.Port}";
         }
 
 
@@ -70,19 +61,11 @@ namespace Instancer.Server.Services.Orchestrators
             return false;
         }
 
-        private string RenderTemplate(string templatePath, Dictionary<string, string> variables, string instanceId)
+        private string SaveCompose(string content, string instanceId)
         {
-            var template = File.ReadAllText(templatePath);
-
-            foreach (var (key, value) in variables)
-            {
-                template = template.Replace($"${{{key}}}", value);
-            }
-
-            // Fichier de sortie
             var outputPath = Path.Combine("generated", $"stack-{instanceId}.yml");
             Directory.CreateDirectory("generated");
-            File.WriteAllText(outputPath, template);
+            File.WriteAllText(outputPath, content);
             return outputPath;
         }
 

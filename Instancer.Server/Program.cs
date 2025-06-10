@@ -19,7 +19,6 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Instancer API",
         Version = "v1",
-        Description = "API pour instancier des stacks à partir de templates"
     });
 });
 builder.Services.AddSingleton<IOrchestrator, DockerOrchestrator>();

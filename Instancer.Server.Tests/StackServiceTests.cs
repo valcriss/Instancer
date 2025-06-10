@@ -22,7 +22,7 @@ public class StackServiceTests
         using var db = CreateDbContext();
         var service = new StackService(db, new FakeOrchestrator());
 
-        var instance = await service.CreateAsync("test", "fastapi-template", 12345);
+        var instance = await service.CreateAsync("test", "services: {}", 12345);
 
         Assert.Equal(1, db.StackInstances.Count());
         Assert.Equal("test", instance.Name);
@@ -35,7 +35,7 @@ public class StackServiceTests
         using var db = CreateDbContext();
         var service = new StackService(db, new FakeOrchestrator());
 
-        var url = await service.CreateAndDeployAsync("name", "fastapi-template");
+        var url = await service.CreateAndDeployAsync("name", "services: {}");
 
         Assert.Equal(1, db.StackInstances.Count());
         var instance = db.StackInstances.First();
