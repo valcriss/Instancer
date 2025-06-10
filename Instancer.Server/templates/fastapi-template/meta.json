@@ -1,6 +1,0 @@
-﻿{
-  "id": "fastapi-template",
-  "name": "FastAPI",
-  "description": "API Python avec Uvicorn",
-  "variables": ["PORT", "APP_ENV"]
-}

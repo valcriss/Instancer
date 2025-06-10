@@ -1,6 +1,8 @@
 using System.CommandLine;
 using System.Net;
 using System.Net.Http.Json;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 public class Program
 {
@@ -19,10 +21,10 @@ public class Program
 
         var up = new Command("up", "Deploy a stack");
         var nameOpt = new Option<string>("--name") { IsRequired = true };
-        var templateOpt = new Option<string>("--template") { IsRequired = true };
+        var fileOpt = new Option<string>("--file") { IsRequired = true };
         up.AddOption(nameOpt);
-        up.AddOption(templateOpt);
-        up.SetHandler(async (string name, string template) => await Up(name, template), nameOpt, templateOpt);
+        up.AddOption(fileOpt);
+        up.SetHandler(async (string name, string file) => await Up(name, file), nameOpt, fileOpt);
 
         var down = new Command("down", "Delete a stack");
         var idOpt = new Option<Guid>("--id") { IsRequired = true };
@@ -47,10 +49,41 @@ public class Program
         return root;
     }
 
-    internal static async Task Up(string name, string template)
+    static IEnumerable<int> GetHostPorts(string compose)
     {
+        foreach (Match m in Regex.Matches(compose, "(\\d+):\\d+"))
+            yield return int.Parse(m.Groups[1].Value);
+    }
+
+    static bool IsPortAvailable(int port)
+    {
+        try
+        {
+            var l = new TcpListener(IPAddress.Loopback, port);
+            l.Start();
+            l.Stop();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    internal static async Task Up(string name, string file)
+    {
+        var compose = File.ReadAllText(file);
+        foreach (var port in GetHostPorts(compose))
+        {
+            if (!IsPortAvailable(port))
+            {
+                Console.WriteLine($"Port {port} unavailable");
+                return;
+            }
+        }
+
         var client = CreateServerClient();
-        var resp = await client.PostAsJsonAsync("/api/stacks", new { Name = name, Template = template });
+        var resp = await client.PostAsJsonAsync("/api/stacks", new { Name = name, Compose = compose });
         resp.EnsureSuccessStatusCode();
         var text = await resp.Content.ReadAsStringAsync();
         Console.WriteLine(text);

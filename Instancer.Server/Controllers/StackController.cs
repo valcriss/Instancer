@@ -21,10 +21,10 @@ namespace Instancer.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStackRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Template))
-                return BadRequest("Name and template are required.");
+            if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Compose))
+                return BadRequest("Name and compose are required.");
 
-            var url = await _stackService.CreateAndDeployAsync(request.Name, request.Template);
+            var url = await _stackService.CreateAndDeployAsync(request.Name, request.Compose);
             var instance = _stackService.GetAll().FirstOrDefault(x => url.Contains(x.Port.ToString()));
 
             return Ok(new

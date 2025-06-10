@@ -3,7 +3,6 @@
     public class CreateStackRequest
     {
         public string Name { get; set; }
-        public string Template { get; set; }
-        public Dictionary<string, string>? Variables { get; set; }
+        public string Compose { get; set; } = string.Empty;
     }
 }

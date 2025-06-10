@@ -10,8 +10,8 @@ namespace Instancer.Server.Models
         public string Name { get; set; }
         [JsonPropertyName("port")]
         public int Port { get; set; }
-        [JsonPropertyName("template")]
-        public string Template { get; set; }
+        [JsonPropertyName("compose")]
+        public string Compose { get; set; } = string.Empty;
         [JsonPropertyName("createdAt")]
         public DateTime CreatedAt { get; set; }
     }

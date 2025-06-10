@@ -24,7 +24,7 @@ public class ControllersTests
         using var db = CreateDbContext();
         var controller = new StackController(new StackService(db, new FakeOrchestrator()));
 
-        var result = await controller.Create(new CreateStackRequest { Name = "", Template = "" });
+        var result = await controller.Create(new CreateStackRequest { Name = "", Compose = "" });
 
         Assert.IsType<BadRequestObjectResult>(result);
     }
@@ -35,29 +35,11 @@ public class ControllersTests
         using var db = CreateDbContext();
         var controller = new StackController(new StackService(db, new FakeOrchestrator()));
 
-        var result = await controller.Create(new CreateStackRequest { Name = "test", Template = "fastapi-template" });
+        var result = await controller.Create(new CreateStackRequest { Name = "test", Compose = "services: {}" });
 
         var ok = Assert.IsType<OkObjectResult>(result);
         Assert.Equal(1, db.StackInstances.Count());
         Assert.NotNull(ok.Value);
     }
 
-    [Fact]
-    public void TemplatesController_GetAll_ReturnsOk()
-    {
-        var originalDir = Directory.GetCurrentDirectory();
-        var serverDir = Path.Combine(originalDir, "Instancer.Server");
-        if (Directory.Exists(serverDir))
-            Directory.SetCurrentDirectory(serverDir);
-        var templateService = new TemplateService();
-        var controller = new TemplatesController(templateService);
-
-        var result = controller.GetAll();
-
-        Directory.SetCurrentDirectory(originalDir);
-
-        var ok = Assert.IsType<OkObjectResult>(result);
-        var templates = Assert.IsAssignableFrom<IEnumerable<object>>(ok.Value!);
-        Assert.NotEmpty(templates);
-    }
 }

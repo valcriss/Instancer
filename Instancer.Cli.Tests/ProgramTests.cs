@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http;
+using System.IO;
 using Xunit;
 using CliProgram = global::Program;
 
@@ -38,7 +39,10 @@ public class ProgramTests
     {
         var handler = new StubHandler { Handler = _ => new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("done") } };
         CliProgram.CreateServerClient = () => new HttpClient(handler) { BaseAddress = new Uri("http://localhost") };
-        var output = await CaptureAsync(() => CliProgram.Up("demo", "tpl"));
+        var tmp = Path.GetTempFileName();
+        await File.WriteAllTextAsync(tmp, "services: {}\n");
+        var output = await CaptureAsync(() => CliProgram.Up("demo", tmp));
+        File.Delete(tmp);
         Assert.Contains("done", output);
     }
 

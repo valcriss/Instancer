@@ -18,13 +18,13 @@ namespace Instancer.Server.Services
 
         public IEnumerable<StackInstance> GetAll() => _db.StackInstances.ToList();
 
-        public async Task<StackInstance> CreateAsync(string name, string template, int port)
+        public async Task<StackInstance> CreateAsync(string name, string compose, int port)
         {
             var instance = new StackInstance
             {
                 Id = Guid.NewGuid(),
                 Name = name,
-                Template = template,
+                Compose = compose,
                 Port = port,
                 CreatedAt = DateTime.UtcNow
             };
@@ -36,14 +36,14 @@ namespace Instancer.Server.Services
         }
 
 
-        public async Task<string> CreateAndDeployAsync(string name, string template)
+        public async Task<string> CreateAndDeployAsync(string name, string compose)
         {
             int port = _orchestrator is DockerOrchestrator docker
                 ? docker.GetAvailablePort()
                 : new Random().Next(10000, 60000); // fallback
 
-            var instance = await CreateAsync(name, template, port);
-            var url = await _orchestrator.DeployStack(instance);
+            var instance = await CreateAsync(name, compose, port);
+            var url = await _orchestrator.DeployStack(instance, compose);
             return url;
         }
 
