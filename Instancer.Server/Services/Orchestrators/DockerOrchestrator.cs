@@ -12,11 +12,11 @@ namespace Instancer.Server.Services.Orchestrators
         {
             var composedFile = SaveCompose(compose, instance.Id.ToString());
 
-            // Appel docker-compose
+            // Appel docker compose (plugin Docker)
             var psi = new ProcessStartInfo
             {
-                FileName = "docker-compose",
-                Arguments = $"-f {composedFile} up -d",
+                FileName = "docker",
+                Arguments = $"compose -f {composedFile} up -d",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
@@ -41,8 +41,8 @@ namespace Instancer.Server.Services.Orchestrators
 
             var psi = new ProcessStartInfo
             {
-                FileName = "docker-compose",
-                Arguments = $"-f {composeFile} down",
+                FileName = "docker",
+                Arguments = $"compose -f {composeFile} down",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };

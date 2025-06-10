@@ -20,10 +20,10 @@ public class DockerOrchestratorTests
         var composeFile = Path.Combine(generatedDir, $"stack-{instanceId}.yml");
         File.WriteAllText(composeFile, "version: '3'");
 
-        // Create fake docker-compose executable
+        // Create fake docker compose executable
         var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(tempDir);
-        var script = Path.Combine(tempDir, "docker-compose");
+        var script = Path.Combine(tempDir, "docker");
         await File.WriteAllTextAsync(script, "#!/bin/sh\nexit 0\n");
         Process.Start("chmod", $"+x {script}")!.WaitForExit();
         var originalPath = Environment.GetEnvironmentVariable("PATH");
