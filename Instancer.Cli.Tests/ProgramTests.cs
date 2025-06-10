@@ -41,7 +41,7 @@ public class ProgramTests
         CliProgram.CreateServerClient = () => new HttpClient(handler) { BaseAddress = new Uri("http://localhost") };
         var tmp = Path.GetTempFileName();
         await File.WriteAllTextAsync(tmp, "services: {}\n");
-        var output = await CaptureAsync(() => CliProgram.Up("demo", tmp));
+        var output = await CaptureAsync(() => CliProgram.Up(tmp, "demo"));
         File.Delete(tmp);
         Assert.Contains("done", output);
     }
@@ -49,15 +49,35 @@ public class ProgramTests
     [Fact]
     public async Task Down_PrintsMessages()
     {
-        var okHandler = new StubHandler { Handler = _ => new HttpResponseMessage(HttpStatusCode.OK) };
+        var dir = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "instancer_test" + Guid.NewGuid()));
+        var original = Directory.GetCurrentDirectory();
+        Directory.SetCurrentDirectory(dir.FullName);
+
+        var stackId = Guid.NewGuid();
+        var json = $"[{{\"id\":\"{stackId}\",\"name\":\"{dir.Name}\"}}]";
+
+        var okHandler = new StubHandler
+        {
+            Handler = req => req.Method == HttpMethod.Get
+                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) }
+                : new HttpResponseMessage(HttpStatusCode.OK)
+        };
         CliProgram.CreateServerClient = () => new HttpClient(okHandler) { BaseAddress = new Uri("http://localhost") };
-        var ok = await CaptureAsync(() => CliProgram.Down(Guid.Empty));
+        var ok = await CaptureAsync(() => CliProgram.Down());
         Assert.Contains("Stack removed", ok);
 
-        var failHandler = new StubHandler { Handler = _ => new HttpResponseMessage(HttpStatusCode.InternalServerError) };
+        var failHandler = new StubHandler
+        {
+            Handler = req => req.Method == HttpMethod.Get
+                ? new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(json) }
+                : new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        };
         CliProgram.CreateServerClient = () => new HttpClient(failHandler) { BaseAddress = new Uri("http://localhost") };
-        var fail = await CaptureAsync(() => CliProgram.Down(Guid.Empty));
+        var fail = await CaptureAsync(() => CliProgram.Down());
         Assert.Contains("Failed to remove", fail);
+
+        Directory.SetCurrentDirectory(original);
+        Directory.Delete(dir.FullName, true);
     }
 
     [Fact]
