@@ -38,7 +38,7 @@ namespace Instancer.Server.Migrations
                     b.Property<int>("Port")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Template")
+                    b.Property<string>("Compose")
                         .IsRequired()
                         .HasColumnType("text");
 
