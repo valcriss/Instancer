@@ -1,43 +1,42 @@
 # Instancer
 
-Instancer est une plateforme permettant de déployer dynamiquement des stacks Docker à distance. Le monorepo se compose de trois projets .NET 8 :
+Instancer is a platform that allows you to remotely deploy Docker stacks dynamically. The monorepo is composed of three .NET 8 projects:
 
-- **Instancer.Server** : API ASP.NET Core gérant l’orchestration des stacks et la persistance.
-- **Instancer.Cli** : client en ligne de commande pour interagir avec le serveur.
-- **Instancer.Daemon** : service local responsable des proxys TCP vers les services distants.
+- **Instancer.Server**: ASP.NET Core API that orchestrates stacks and persistence.
+- **Instancer.Cli**: command line client used to interact with the server.
+- **Instancer.Daemon**: local service responsible for TCP proxies to the remote services.
 
-## Prérequis
+## Prerequisites
 
-- [Docker](https://www.docker.com/) pour exécuter la base de données et construire l’image du serveur.
-- [.NET 8 SDK](https://dotnet.microsoft.com/) pour compiler et exécuter les projets.
+- [Docker](https://www.docker.com/) to run the database and build the server image.
+- [.NET 8 SDK](https://dotnet.microsoft.com/) to build and run the projects.
 
-## Lancer les composants en développement
+## Running the components in development
 
-1. Démarrer la base PostgreSQL nécessaire au serveur :
+1. Start the PostgreSQL database required by the server:
    ```bash
    docker compose -f Instancer.Server/docker-compose.dev.yml up -d
    ```
-2. Lancer l’API :
+2. Launch the API:
    ```bash
    dotnet run --project Instancer.Server
    ```
-3. Démarrer le daemon local (pour les redirections de ports) :
+3. Start the local daemon (for port forwarding):
    ```bash
    dotnet run --project Instancer.Daemon
    ```
-4. Utiliser le client CLI pour déployer ou gérer les stacks :
+4. Use the CLI client to deploy or manage stacks:
    ```bash
-   dotnet run --project Instancer.Cli -- <commande>
+   dotnet run --project Instancer.Cli -- <command>
    ```
-   Les commandes disponibles sont `up`, `down`, `status` et `proxy`.
+   The available commands are `up`, `down`, `status` and `proxy`.
 
-## Construction de l’image Docker du serveur
+## Building the server Docker image
 
-Une image Docker peut être générée à partir du fichier `Instancer.Server/Dockerfile` :
+A Docker image can be created using `Instancer.Server/Dockerfile`:
 
 ```bash
 docker build -t instancer-server -f Instancer.Server/Dockerfile .
 ```
 
-L’image résultante embarque l’API ASP.NET Core prête à être déployée sur votre plateforme de conteneurisation.
-
+The resulting image contains the ASP.NET Core API ready to be deployed on your container platform.
