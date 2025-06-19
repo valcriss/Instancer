@@ -405,3 +405,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Instancer.Server/generated
+
+.idea/
