@@ -1,22 +1,22 @@
-﻿using instancer.cli.Commands.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CommandLine;
 
-namespace instancer.cli.Commands
+namespace instancer.cli.Commands;
+
+[Verb("down", HelpText = "Stops the stack.")]
+public class DownOptions
 {
-    public class DownCommand : Command
-    {
-        public override string Name { get; protected set; } = "down";
-        public override string Description { get; protected set; } = "Stops the stack.";
-        public override string[]? Aliases { get; protected set; } = new[] { "stop" };
+    [Option('v', "verbose", HelpText = "Enable verbose output.")]
+    public bool Verbose { get; set; }
+}
 
-        public override int Execute(Dictionary<string, string>? args)
+public static class DownCommand
+{
+    public static void Run(DownOptions opts)
+    {
+        Console.WriteLine("Executing 'down' command...");
+        if (opts.Verbose)
         {
-            Console.WriteLine("Executing 'down' command...");
-            return 0;
+            Console.WriteLine("Verbose mode enabled.");
         }
     }
 }

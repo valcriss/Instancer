@@ -1,22 +1,29 @@
-﻿using instancer.cli.Commands.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CommandLine;
 
-namespace instancer.cli.Commands
+namespace instancer.cli.Commands;
+
+[Verb("up", HelpText = "Starts the stack.")]
+public class UpOptions
 {
-    public class UpCommand : Command
-    {
-        public override string Name { get; protected set; } = "up";
-        public override string Description { get; protected set; } = "Starts the stack.";
-        public override string[]? Aliases { get; protected set; } = new[] { "start", "run" };
+    [Option('f', "file", HelpText = "Stack configuration file.")]
+    public string? File { get; set; }
 
-        public override int Execute(Dictionary<string, string>? args)
+    [Option('v', "verbose", HelpText = "Enable verbose output.")]
+    public bool Verbose { get; set; }
+}
+
+public static class UpCommand
+{
+    public static void Run(UpOptions opts)
+    {
+        Console.WriteLine("Executing 'up' command...");
+        if (!string.IsNullOrEmpty(opts.File))
         {
-            Console.WriteLine("Executing 'up' command...");
-            return 0;
+            Console.WriteLine($"File: {opts.File}");
+        }
+        if (opts.Verbose)
+        {
+            Console.WriteLine("Verbose mode enabled.");
         }
     }
 }
