@@ -1,12 +1,17 @@
-﻿using instancer.cli.Commands.Core;
+using CommandLine;
+using instancer.cli.Commands;
 
 namespace instancer.cli;
 
-static class Program
+public static class Program
 {
-    static int Main(string[] args)
+    public static int Main(string[] args)
     {
-        CommandManager commandManager = new CommandManager();
-        return commandManager.Execute(args);
+        return Parser.Default
+            .ParseArguments<UpOptions, DownOptions>(args)
+            .MapResult(
+                (UpOptions opts) => { UpCommand.Run(opts); return 0; },
+                (DownOptions opts) => { DownCommand.Run(opts); return 0; },
+                errs => 1);
     }
 }
